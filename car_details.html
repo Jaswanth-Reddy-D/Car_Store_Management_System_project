@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Details</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Car Details</h1>
+    </header>
+    <div id="car-details"></div>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const carId = urlParams.get("id");
+
+        fetch(`php/get_car.php?id=${carId}`)
+            .then(response => response.json())
+            .then(car => {
+                document.getElementById("car-details").innerHTML = `
+                    <h2>${car.name}</h2>
+                    <img src="images/${car.image}" width="300">
+                    <p>Brand: ${car.brand}</p>
+                    <p>Price: $${car.price}</p>
+                    <p>${car.description}</p>
+                `;
+            })
+            .catch(error => console.log("Error fetching car details:", error));
+    </script>
+</body>
+</html>

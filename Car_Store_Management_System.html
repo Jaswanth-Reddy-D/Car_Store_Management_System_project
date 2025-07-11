@@ -1,0 +1,88 @@
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
+
+const Home = () => {
+  const [cars, setCars] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:5000/cars").then((response) => {
+      setCars(response.data);
+    });
+  }, []);
+
+  return (
+    <div className="p-4">
+      <h1 className="text-3xl font-bold mb-6 text-center">Car Store</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {cars.map((car, index) => (
+          <Card key={index} className="p-4 shadow-lg rounded-lg">
+            <CardContent>
+              <h2 className="text-xl font-semibold">{car.name}</h2>
+              <p className="text-gray-600">Price: ${car.price}</p>
+              <Link to={`/car/${car.id}`}>
+                <Button className="mt-3 bg-blue-600 hover:bg-blue-700 text-white">View Details</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const CarDetails = ({ id }) => {
+  const [car, setCar] = useState(null);
+
+  useEffect(() => {
+    axios.get(`http://localhost:5000/car/${id}`).then((response) => {
+      setCar(response.data);
+    });
+  }, [id]);
+
+  if (!car) return <p>Loading...</p>;
+
+  return (
+    <div className="p-4 text-center">
+      <h1 className="text-3xl font-bold mb-4">{car.name}</h1>
+      <p className="text-gray-700 text-lg">{car.description}</p>
+      <p className="text-gray-600 font-semibold mt-2">Price: ${car.price}</p>
+    </div>
+  );
+};
+
+const Login = () => (
+  <div className="p-6 max-w-md mx-auto shadow-md rounded-lg border bg-white">
+    <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
+    <input type="text" placeholder="Username" className="border p-2 w-full mt-2 rounded" />
+    <input type="password" placeholder="Password" className="border p-2 w-full mt-2 rounded" />
+    <Button className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white">Login</Button>
+  </div>
+);
+
+const AdminDashboard = () => (
+  <div className="p-4">
+    <h1 className="text-3xl font-bold mb-4 text-center">Admin Dashboard</h1>
+    <p className="text-gray-600">Manage car inventory and orders here.</p>
+  </div>
+);
+
+const App = () => (
+  <Router>
+    <nav className="p-4 bg-gray-800 text-white flex gap-4 justify-center">
+      <Link to="/" className="hover:text-gray-300">Home</Link>
+      <Link to="/login" className="hover:text-gray-300">Login</Link>
+      <Link to="/admin" className="hover:text-gray-300">Admin</Link>
+    </nav>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/car/:id" element={<CarDetails />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/admin" element={<AdminDashboard />} />
+    </Routes>
+  </Router>
+);
+
+export default App;
